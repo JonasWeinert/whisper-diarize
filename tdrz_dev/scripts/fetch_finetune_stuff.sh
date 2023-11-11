@@ -15,14 +15,12 @@ cd ..
 
 WORKDIR=$PWD/workdir_finetune
 
-mkdir -p $WORKDIR
+# Create the workdir_finetune and datasets directories
+mkdir -p $WORKDIR/datasets
 
-azcopy cp https://sharedstorage7190.blob.core.windows.net/tinydiarize/precomputed/tdrz_ft_ami_prepared-hf_datasets.tar.gz $WORKDIR/
-tar -zxvf $WORKDIR/tdrz_ft_ami_prepared-hf_datasets.tar.gz -C $WORKDIR
+# Change the commands to use the datasets directory
+azcopy cp https://sharedstorage7190.blob.core.windows.net/tinydiarize/precomputed/tdrz_ft_ami_prepared-hf_datasets.tar.gz $WORKDIR/datasets/
+tar -zxvf $WORKDIR/datasets/tdrz_ft_ami_prepared-hf_datasets.tar.gz -C $WORKDIR/datasets
 echo "Fetched finetuning dataset"
 
-azcopy cp https://sharedstorage7190.blob.core.windows.net/tinydiarize/precomputed/workdir_finetune-03_09_23.tar.gz $WORKDIR/
-tar -zxvf $WORKDIR/workdir_finetune-03_09_23.tar.gz -C $WORKDIR
-echo "Fetched finetune runs and checkpoints"
-
-cd ./scripts
+cd ../../scripts
