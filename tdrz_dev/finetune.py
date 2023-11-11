@@ -185,7 +185,7 @@ if __name__ == "__main__":
     parser.add_argument("--per_device_train_batch_size", type=int, default=16)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
     parser.add_argument("--gradient_checkpointing", type=bool, default=True)
-    #parser.add_argument("--fp16", type=bool, default=False)
+    parser.add_argument("--fp16", type=bool, default=False)
     parser.add_argument("--evaluation_strategy", type=str, default="steps")
     parser.add_argument("--prediction_loss_only", type=bool, default=True)
     parser.add_argument("--eval_steps", type=int, default=200)
@@ -244,7 +244,7 @@ if __name__ == "__main__":
 
     # training args
     #print("FP16 argument is set to:", args_dict["fp16"])
-    training_args = Seq2SeqTrainingArguments(**args_dict, fp16=False)
+    training_args = Seq2SeqTrainingArguments(**args_dict)
 
     # compute metrics for eval (skip for now)
 
