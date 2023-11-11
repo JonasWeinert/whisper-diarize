@@ -112,7 +112,7 @@ class DecodingOptions:
     with_speaker_turns: bool = False  # enable <|speakerturn|> tokens (tdrz model only)
 
     # implementation details
-    fp16: bool = True  # use fp16 for most of the calculation
+    fp16: bool = False  # use fp16 for most of the calculation
 
 
 @dataclass(frozen=True)

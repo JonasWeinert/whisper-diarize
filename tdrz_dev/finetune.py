@@ -20,8 +20,9 @@ from transformers import (
     WhisperForConditionalGeneration,
 )
 
+
 DATADIR = os.path.realpath("workdir_finetune/datasets")  # TODO@Akash - handle this in args
-WHISPERMODEL = "openai/whisper-small.en"                   # TODO@Akash - handle this in args
+WHISPERMODEL = "openai/whisper-small"                   # TODO@Akash - handle this in args
 
 feature_extractor = WhisperFeatureExtractor.from_pretrained(WHISPERMODEL)
 tokenizer = WhisperDiarizedTokenizer.from_pretrained(WHISPERMODEL)
@@ -184,7 +185,7 @@ if __name__ == "__main__":
     parser.add_argument("--per_device_train_batch_size", type=int, default=16)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
     parser.add_argument("--gradient_checkpointing", type=bool, default=True)
-    parser.add_argument("--fp16", type=bool, default=True)
+    #parser.add_argument("--fp16", type=bool, default=False)
     parser.add_argument("--evaluation_strategy", type=str, default="steps")
     parser.add_argument("--prediction_loss_only", type=bool, default=True)
     parser.add_argument("--eval_steps", type=int, default=200)
@@ -202,20 +203,31 @@ if __name__ == "__main__":
 
     # reference: https://huggingface.co/blog/fine-tune-whisper
 
-    # load datasets and pre-process for training
+    # load datasets and pre-process for training if needed
     train_datasets = dict()
-    for split in "train", "val":
-        ds = datasets.load_from_disk(f"{DATADIR}/ami_{split}_chunked")
-        # ds.cleanup_cache_files()  # NOTE: uncomment when you want reprocess/tokenize the dataset
-        ds_for_train = ds.map(
-            prepare_dataset,
-            remove_columns=ds.column_names,
-            num_proc=4,
-            batched=True,
-            batch_size=1,
-        )
+    for split in ["train", "val"]:  # Make sure this is a list
+        processed_dataset_path = f"{DATADIR}/ami_{split}_chunked_processed"
+        raw_dataset_path = f"{DATADIR}/ami_{split}_chunked"
+        if os.path.exists(processed_dataset_path) and os.listdir(processed_dataset_path):
+            logger.info(f"Loading processed dataset from {processed_dataset_path}")
+            ds_for_train = datasets.load_from_disk(processed_dataset_path)
+        else:
+            if not os.path.exists(raw_dataset_path):
+                raise FileNotFoundError(f"Raw dataset directory not found at {raw_dataset_path}")
+            os.makedirs(processed_dataset_path, exist_ok=True)
+            logger.info(f"Processing raw dataset and saving to {processed_dataset_path}...")
+            ds = datasets.load_from_disk(raw_dataset_path)
+            ds_for_train = ds.map(
+                prepare_dataset,
+                remove_columns=ds.column_names,
+                num_proc=4,
+                batched=True,
+                batch_size=1,
+            )
+            ds_for_train.save_to_disk(processed_dataset_path)
+            logger.info(f"Saved processed dataset to {processed_dataset_path}")
         train_datasets[split] = ds_for_train
-
+        
     # data collator
     data_collator = DataCollatorSpeechSeq2SeqWithPadding(feature_extractor, tokenizer)
 
@@ -231,7 +243,8 @@ if __name__ == "__main__":
     )
 
     # training args
-    training_args = Seq2SeqTrainingArguments(**args_dict)
+    #print("FP16 argument is set to:", args_dict["fp16"])
+    training_args = Seq2SeqTrainingArguments(**args_dict, fp16=False)
 
     # compute metrics for eval (skip for now)
 
