@@ -185,7 +185,7 @@ if __name__ == "__main__":
     parser.add_argument("--per_device_train_batch_size", type=int, default=16)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
     parser.add_argument("--gradient_checkpointing", type=bool, default=True)
-    parser.add_argument("--fp16", type=bool, default=False)
+    parser.add_argument("--fp16", type=bool, default=True)
     parser.add_argument("--evaluation_strategy", type=str, default="steps")
     parser.add_argument("--prediction_loss_only", type=bool, default=True)
     parser.add_argument("--eval_steps", type=int, default=200)
@@ -204,11 +204,20 @@ if __name__ == "__main__":
     # reference: https://huggingface.co/blog/fine-tune-whisper
 
     # load datasets and pre-process for training if needed
+    def is_valid_processed_dataset(directory):
+        # Implement a check for key files in the directory
+        # This is an example; adjust according to your dataset's structure
+        expected_files = ["file1.extension", "file2.extension"]  # Replace with actual file names/conditions
+        return all(os.path.exists(os.path.join(directory, f)) for f in expected_files)
+
+    # load datasets and pre-process for training if needed
     train_datasets = dict()
-    for split in ["train", "val"]:  # Make sure this is a list
+    for split in ["train", "val"]:
         processed_dataset_path = f"{DATADIR}/ami_{split}_chunked_processed"
         raw_dataset_path = f"{DATADIR}/ami_{split}_chunked"
-        if os.path.exists(processed_dataset_path) and os.listdir(processed_dataset_path):
+
+        # Check if processed dataset exists and is valid
+        if os.path.exists(processed_dataset_path) and is_valid_processed_dataset(processed_dataset_path):
             logger.info(f"Loading processed dataset from {processed_dataset_path}")
             ds_for_train = datasets.load_from_disk(processed_dataset_path)
         else:
@@ -226,6 +235,7 @@ if __name__ == "__main__":
             )
             ds_for_train.save_to_disk(processed_dataset_path)
             logger.info(f"Saved processed dataset to {processed_dataset_path}")
+
         train_datasets[split] = ds_for_train
         
     # data collator

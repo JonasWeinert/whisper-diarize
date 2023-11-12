@@ -21,6 +21,7 @@ _MODELS = {
     "base": "https://openaipublic.azureedge.net/main/whisper/models/ed3a0b6b1c0edf879ad9b11b1af5a0e6ab5db9205f891f668f8b0e6c6326e34e/base.pt",
     "small.en": "https://openaipublic.azureedge.net/main/whisper/models/f953ad0fd29cacd07d5a9eda5624af0f6bcf2258be67c92b79389873d91e0872/small.en.pt",
     "small.en-tdrz": "https://sharedstorage7190.blob.core.windows.net/tinydiarize/whisper/models/53dfb0a7f5393bd3612173f84cad3fa2b347a3106b53c116628ead31641e9a53/small.en-tdrz.pt",
+    "small_d": "/Users/jonas/Documents/GitHub/whisper-diarize/tdrz_dev/workdir_finetune/converted checkpoints/small_d.pt",
     "small": "https://openaipublic.azureedge.net/main/whisper/models/9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794/small.pt",
     "medium.en": "https://openaipublic.azureedge.net/main/whisper/models/d7440d1dc186f76616474e0ff0b3b6b879abc9d1a4926b7adfa41db2d497ab4f/medium.en.pt",
     "medium": "https://openaipublic.azureedge.net/main/whisper/models/345ae4da62f9b3d59415adc60127b97c714f32e89e936602e85993674d08dcb1/medium.pt",
